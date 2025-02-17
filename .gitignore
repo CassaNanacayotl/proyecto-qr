@@ -1,6 +1,6 @@
-__pycache__/
+echo "__pycache__/
 *.pyc
 .env
 .DS_Store
 instance/
-*.db
+*.db" > .gitignore
