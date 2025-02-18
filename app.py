@@ -10,9 +10,16 @@ load_dotenv()
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
-# Inicializar la base de datos al arrancar
-with app.app_context():
-    init_db()
+# Movemos la inicialización dentro de una función
+def initialize_database():
+    with app.app_context():
+        init_db()
+
+# Ruta para inicializar la base de datos
+@app.route('/init-db')
+def setup_database():
+    initialize_database()
+    return jsonify({"message": "Base de datos inicializada"})
 
 @app.route('/')
 def home():
@@ -40,7 +47,7 @@ def generate_qr():
             VALUES (?, ?, ?, ?, ?)
         ''', (ticket_id, data['name'], data['email'], 
               datetime.now().isoformat(), 
-              'TEMP_CODE'))  # Después implementaremos la generación del código
+              'TEMP_CODE'))
         
         db.commit()
         
@@ -55,7 +62,8 @@ def generate_qr():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
     finally:
-        db.close()
+        if 'db' in locals():
+            db.close()
 
 if __name__ == '__main__':
     app.run()
