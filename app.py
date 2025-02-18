@@ -11,21 +11,15 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
 # Movemos la inicialización dentro de una función
-def initialize_database():
+def init_db():
     with app.app_context():
         init_db()
 
 # Ruta para inicializar la base de datos
 @app.route('/init-db')
 def setup_database():
-    try:
-        init_db()  # Llama a la función correcta
-        return jsonify({"message": "Base de datos inicializada"}), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-if __name__ == "__main__":
-    app.run(debug=True)
+    init_db()
+    return jsonify({"message": "Base de datos inicializada"})
 
 @app.route('/')
 def home():
